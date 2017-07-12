@@ -1,0 +1,59 @@
+
+/////////////////////////////////////////////////////////
+///////////////WinSetupFromUSB 1.0 beta//////////////////
+////////Загрузочная флешка XP, Vista, Windows 7//////////
+/////////////////////////////////////////////////////////
+//Скачать
+https://yadi.sk/d/OjLM5eI_dsVXP
+
+//Форматирование
+ - Окно "USB disk selection and format"
+    - Кнопка "Bootice"
+       - Окно "Destination Disk"
+          - Выбор устройства
+          - Кнопка "Perform Format"
+             - Окно "Reparation and Format"
+                - Радио "USB-HDD mode (Single Partition)"
+                - Кнопка "Next Step"
+             - Окно "Patriot Memory"
+                - Комбобокс "File System:" -> "NTFS"
+                - Поле "Vol Label:" -> "Windows XP"
+                - Кнопка "ОК"
+                – Кнопка "ОК"
+                - Кнопка "Да"
+       - Окно "Destination Disk"
+          - Кнопка "Process MBR"
+             - Окно
+                - Радио
+                   - Для Windows XP -> "Windows NT 5.x MBR"
+                   - Для Vista или Windows 7 -> "Windows NT 6.x MBR"
+                - Кнопка "Install/Config"
+                - Кнопки Оk, Ok, Return
+                - Закрыть окно "USB disk selection and format"
+
+//Запись образа
+ - Окно "Add to USB disk"
+ - Чекбокс напротив системы, которую устанавливаем
+ - Если образ в iso - монтируем его в Demon Tools
+ - Выбираем путь к диску
+ - GO
+
+
+
+/////////////////////////////////////////////////////////
+/////////////////WinSetupFromUSB 1.7/////////////////////
+////////////Загрузочная флешка Windows 10////////////////
+/////////////////////////////////////////////////////////
+//Скачать
+http://www.winsetupfromusb.com/files/download-info/winsetupfromusb-1-7-exe/
+https://yadi.sk/d/E5s78O_P3Fos3Y
+
+- Окно WinSetupFromUSB
+   - Выбор устройства (флешки)
+   - Чекбокс "Auto format it with FBinst"
+   - Радио "FAT32"
+   - Чекбокс "Windows Vista / 7 / 8 / 10 /Server 2008/2012 based ISO"
+   - Напротив чекбокса выбор образа напротив
+   - Кнопка "GO"
+   - Кнопки "Да", "Да"
+
