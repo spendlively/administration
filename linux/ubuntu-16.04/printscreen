@@ -1,0 +1,13 @@
+#!/bin/bash
+curDate=$(date)
+imgExtension=".png"
+imgName=$curDate$imgExtension
+imgDirectory="/home/spendlively/screenshots/"
+imgSavePath=$imgDirectory$imgName
+gnome-screenshot --file="$imgSavePath"
+
+# crontab -e
+# или
+# sudo crontab -u имя_пользователя -e
+# */10 * * * *    DISPLAY=:0 /home/spendlively/screenshots/cmd
+#
