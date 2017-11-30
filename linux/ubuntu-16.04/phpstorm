@@ -6,5 +6,7 @@ git clone https://github.com/zheludkovm/LinuxJavaFixes.git fix
 nano /opt/PhpStorm/bin/phpstorm64.vmoptions
 
 3. Добавляем в него строку с фиксом:
--javaagent:/home/user/fix/build/LinuxJavaFixes-1.0.0-SNAPSHOT.jar
+-javaagent:/home/spendlively/fix/build/LinuxJavaFixes-1.0.0-SNAPSHOT.jar
+
+4. Если phpStorm переустанавливается, то импортировать старые настройки нельзя
 
