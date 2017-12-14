@@ -114,4 +114,53 @@ systemctl restart postfix
 
 
 
-//POP3 и IMAP
+//POP3 и IMAP (Dovecot)
+POP (Post Office Protocol)
+ - после отправки пользователю почты удаляет письма с сервера
+
+IMAP (Internet Message Access Protocol)
+- поддерживает три режима доступа к почте
+   - онлайн-режим  - похож на прямой доступ к файловой системе на почтовом сервере
+   - оффлайн-режим  - похож на POP, когда клиент отключается от сети после получения своих писем. В этом режиме сервер обычно не хранит копии писем
+   - автономный режим - позволяет пользователям хранить кэшированные копии своих писем, а сервер так же хранит копии этих писем
+
+
+
+
+
+//Установка Dovecot
+ - apt-get -y install dovecot-imapd dovecot-pop3d
+    - предложат создать самозаверенный сертификат для работы с IMAP и POP3 по SSL/TLS
+    - Ответьте на вопрос yes и, при появлении соответствующего запроса, введите имя хоста вашей системы
+ - systemctl start dovecot
+ - systemctl enable dovecot
+
+
+
+
+
+//Настройка Dovecot
+///etc/dovecot/dovecot.conf (или /etc/dovecot/conf.d/)
+ - protocols = imap pop3 lmtp - протоколы, которые надо поддерживать (lmtp означает Local Mail Transfer Protocol)
+ - listen = *, :: - IP-адрес, который будет слушать сервер (* означает все интерфейсы IPv4, двойное двоеточие означает все интерфейсы IPv6)
+ - userdb - база данных пользователей для аутентификации
+userdb {
+ driver = pam
+}
+ - mail_location = mbox:~/mail:INBOX=/var/mail/%u - запись в файле /etc/dovecot/conf.d/10-mail.conf
+ - Dovecot поставляется со стандартными SSL-сертификатами и файлами ключей, которые используются в файле /etc/dovecot/conf.d/10-ssl.conf
+    - ssl_cert = </etc/pki/dovecot/certs/dovecot.pem
+    - ssl_key = </etc/pki/dovecot/private/dovecot.pem
+Когда пользователь пытается подключиться к Dovecot, сервер покажет предупреждение, так как сертификаты не подписаны
+
+//Не забудьте открыть порты сервера Dovecot на файрволе
+iptables  -A INPUT -p tcp --dport 110 -j ACCEPT
+iptables  -A INPUT -p tcp --dport 995 -j ACCEPT
+iptables  -A INPUT -p tcp --dport 143 -j ACCEPT
+iptables  -A INPUT -p tcp --dport 993 -j ACCEPT
+iptables  -A INPUT -p tcp --dport 25  -j ACCEPT
+
+//Если что-то пошло не так, лог-файлы
+ - /var/log/messages
+ - /var/log/maillog
+ - /var/log/mail.log

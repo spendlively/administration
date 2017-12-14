@@ -17,4 +17,5 @@ MX 100 mx4.tendence.ru.
  - проверка mx записей
     - telnet mysite.ru 25
     - telnet 127.0.0.1 25
+    - nslookup -type=mx mysite.ru
  - reg.ru - @ MX mx.spendmail.ru. 1
