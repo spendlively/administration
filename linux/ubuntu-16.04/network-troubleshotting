@@ -1,0 +1,64 @@
+
+
+//https://likegeeks.com/linux-network-commands/
+
+//Check Network Connectivity
+- ping google.com
+- ping -c 3 google.com
+
+
+
+//Get DNS Records
+- dig google.com
+- dig google.com MX
+- dig google.com ANY
+- dig –x 8.8.8.8
+- host –a google.com
+- host 8.8.8.8
+
+
+
+//Diagnose Network Latency
+- traceroute google.com
+- traceroute -n google.com
+- sudo traceroute -I google.com
+- sudo traceroute -T google.com
+//Realtime Tracing
+- mtr google.com
+- mtr --report google.com
+
+
+
+//Checking Connection Performance
+- ss | less
+- ss -ta
+- ss -t4 state established
+- ss -t4 state closed
+- ss dst XXX.XXX.XXX.XXX
+- ss dst XXX.XXX.XXX.XXX:22
+
+
+
+//Traffic monitoring
+- sudo iftop -I <interface>
+- sudo iftop -P
+- iftop -B
+
+
+
+//arp Command
+- arp
+- arp -n
+- arp -d HWADDR
+
+
+
+//tcpdump
+- tcpdump -i <network_device>
+- tcpdump -i <network_device> tcp
+- tcpdump -i <network_device> port 80
+- tcpdump -c 20 -i <network_device>
+- tcpdump -c 20 -i <network_device> src XXX.XXX.XXX.XXX
+- ifconfig
+- tcpdump -w /path/ -i <network_device>
+- tcpdump -r /path
