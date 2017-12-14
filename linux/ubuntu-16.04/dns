@@ -1,0 +1,20 @@
+
+//https://www.reg.ru/support/domains/dns_servery_i_nastroika_zony/Nastroika-zony/nastroika-resursnyh-zapisei-dlya-domena
+
+//Записи
+//A - ip v4
+@ .spendmail.ru 80.64.174.27
+
+//AAAA - ip v6
+
+//MX
+MX 1 mx1.tendence.ru.
+MX 5 mx2.tendence.ru.
+MX 10 mx3.tendence.ru.
+MX 100 mx4.tendence.ru.
+ - адресом почтового сервера в MX-записи не может быть IP-адрес
+ - 1 - наибольший приоритет
+ - проверка mx записей
+    - telnet mysite.ru 25
+    - telnet 127.0.0.1 25
+ - reg.ru - @ MX mx.spendmail.ru. 1
