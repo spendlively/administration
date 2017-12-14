@@ -1,0 +1,117 @@
+
+//Порты открытый/tls
+ - SMTP - 25, 587
+ - POP3 - 110, 995
+ - IMAP - 143, 993
+
+
+
+
+
+//Термины
+ - MUA - Mail User Agent - Почтовый клиент/почтовый агент
+ - MTA - Mail Transport Agent - Почтовый сервер/агент пересылки сообщений (Sendmail и Postfix)
+ - MDA - Mail Delivery Agent - Агент доставки электронной почты (Postfix-maildrop и Procmail)
+
+
+
+
+
+//Установка
+apt-get install postfix
+
+- указать общий тип почтовой настройки (default или No configuration)
+- fqdn-имя - имя, на которое ссылается MX-запись вашего домена
+   - для записи mail.bissquit.com лучше указать имя сервера — mail
+   - или оставить предложенное имя по умолчанию (оно будет совпадать с именем системы)
+
+
+
+
+
+//основная настрока сервера /etc/postfix/main.cf (в настройках можно ссылаться на параметры, добавляя знак $ перед именем переменной)
+ - myhostname = mail.mydomain.com или smtp.mydomain.com - имя хоста в интернете, для которого Postfix будет получать почту
+ - mydomain = mydomain.com - почтовый домен, обслуживанием которого занимается сервер
+Зная mydomain, Postfix может получить myhostname, просто объединив mydomain и имя хоста
+ - myorigin = $mydomain - добавление к адресам отправителей/получателей имени домена
+ - mydestination = $myhostname, $mydomain - домены, которые Postfix будет считать конечными пунктами назначения для входящей почты
+ - mydestination = $myhostname, localhost.$mydomain, $mydomain, mail.$mydomain, www.$mydomain
+    - postconf mydestination - проверка наличия необходимых адресов в параметре mydestination
+
+//дополнительно
+ - mail_spool_directory = /var/spool/mail
+    - Postfix может использовать два режима доставки почты:
+       - непосредственно в почтовый ящик пользователя
+       - в центральную директорию очередей, при этом почта попадает в папку /var/spool/mail, где имеется файл для каждого пользователя
+ - mynetworks = 127.0.0.0/8, 192.168.1.0/24
+    - указывать какие сервера могут пересылать почту через сервер Postfix (сервером могут заинтересоваться спамеры)
+ - smtpd_banner
+    - ответ, который возвращает сервер при подключении клиентов
+    - лучше поменять, чтобы оно не указывало на то, какой сервер используется
+ - inet_protocols = ipv4 - задать версию IP, которую будет использовать Postfix при установлении соединений
+
+systemctl reload postfix - применить изменения
+
+//Настрока алиасов /etc/aliases
+ - root: mailserveradmin - перенаправить всю входящую для root почту на другую учетную запись
+ls -l /etc/ | grep aliases
+aliases - файл алиасов
+aliases.db - индексированная копия, к которой обращается Postfix. (пока не пересоздадим изменений Postfix не заметит)
+ - postalias hash:/etc/aliases - команда для переиндексации
+ - postfix reload - команда для обновления конфигурации Postfix без перезапуска демона
+
+
+
+
+
+//Администрирование
+ - systemctl start postfix - запустить
+ - systemctl enable postfix - включить автозапуск
+ - systemctl reload postfix - перезагрузить
+ - postfix check - проверить правильность настроек
+ - mailq - показать сообщения в очереди
+ - postfix flush - очистить очередь
+ - логи - /var/log/mail.log
+
+
+
+
+//Тестирование сервера
+ - отправить письмо
+echo "This is message body" | mailx -s "This is Subject" -r "likegeeks<likegeeks@example.com>" -a /path/to/attachment someone@example.com
+ - принять письмо
+ - проверка записей DNS
+    - dig google.com
+    - dig google.com MX
+    - dig –x 8.8.8.8
+
+
+
+
+
+//Защита SMTP-соединения
+//Генерация ключа
+openssl genrsa -des3 -out mail.key
+openssl req -new -key mail.key -out mail.csr
+cp mail.key mail.key.original
+openssl rsa -in mail.key.original -out mail_secure.key
+openssl x509 -req -days 365 -in mail.csr -signkey mail_secure.key -out mail_secure.crt
+cp mail_secure.crt /etc/postfix/
+cp mail_secure.key /etc/postfix/
+
+//Настройка - /etc/postfix/main.cf
+smtpd_use_tls = yes
+smtpd_tls_cert_file = /etc/postfix/mail_secure.crt
+smtpd_tls_key_file = /etc/postfix/mail_secure.key
+smtp_tls_security_level = may
+
+//Перезагрузка
+systemctl restart postfix
+
+При подключении клиента нужно указать TLS
+
+
+
+
+
+//POP3 и IMAP
