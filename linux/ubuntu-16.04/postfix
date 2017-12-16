@@ -36,7 +36,7 @@ apt-get install postfix
  - myorigin = $mydomain - добавление к адресам отправителей/получателей имени домена
  - mydestination = $myhostname, $mydomain - домены, которые Postfix будет считать конечными пунктами назначения для входящей почты
  - mydestination = $myhostname, localhost.$mydomain, $mydomain, mail.$mydomain, www.$mydomain
-    - postconf mydestination - проверка наличия необходимых адресов в параметре mydestination
+ - postconf mydestination - проверка наличия необходимых адресов в параметре mydestination
 
 //дополнительно
  - mail_spool_directory = /var/spool/mail
@@ -78,7 +78,9 @@ aliases.db - индексированная копия, к которой обр
 
 //Тестирование сервера
  - отправить письмо
-echo "This is message body" | mailx -s "This is Subject" -r "likegeeks<likegeeks@example.com>" -a /path/to/attachment someone@example.com
+apt-get install bsd-mailx
+echo "This is message body" | mailx -s "This is Subject" -r "root<root@spendmail.ru>" spendlively@mail.ru
+echo "This is message body" | mailx -s "This is Subject" -r "root<root@spendmail.ru>" -a /path/to/attachment spendlively@mail.ru
  - принять письмо
  - проверка записей DNS
     - dig google.com
@@ -95,7 +97,7 @@ openssl genrsa -des3 -out mail.key
 openssl req -new -key mail.key -out mail.csr
 cp mail.key mail.key.original
 openssl rsa -in mail.key.original -out mail_secure.key
-openssl x509 -req -days 365 -in mail.csr -signkey mail_secure.key -out mail_secure.crt
+openssl x509 -req -days 36500 -in mail.csr -signkey mail_secure.key -out mail_secure.crt
 cp mail_secure.crt /etc/postfix/
 cp mail_secure.key /etc/postfix/
 
@@ -164,3 +166,292 @@ iptables  -A INPUT -p tcp --dport 25  -j ACCEPT
  - /var/log/messages
  - /var/log/maillog
  - /var/log/mail.log
+
+
+
+
+
+//TELNET
+telnet mail.spendmail.ru 25
+helo 192.168.1.103
+mail from: spendlively@spendmail.ru
+rcpt to: spendlively@mail.ru
+data
+Subject: test subject from telnet
+Текст письма,
+а в конце письма одну точку в строке, чтобы закончить
+.
+
+quit
+
+
+
+
+
+//Проблемы
+1. Ошибка postfix при отправке почты
+Relay access denied
+
+Лог/var/log/mail.log
+NOQUEUE: reject: RCPT from 80.64.174.27.sta.211.ru[80.64.174.27]: 454 4.7.1 <spendlively@mail.ru>: Relay access denied; from=<spendlively@spendmail.ru> to=<spendlively@mail.ru> proto=SMTP helo=<192.168.1.103>
+
+Решение /etc/postfix/main.cf
+mynetworks = 127.0.0.0/8 192.168.1.0/24 80.64.174.27
+
+
+
+
+
+
+
+nano /etc/network/interfaces
+auto lo
+iface lo inet loopback
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet static
+    address 192.168.1.50
+    gateway 192.168.1.1
+    netmask 255.255.255.0
+
+service networking restart
+ifconfig
+
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////ПРИМЕР НАСТРОЙКМ POSTFIX + DOVECOT//////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////
+///////////POSTFIX///////////////
+/////////////////////////////////
+apt-get install postfix -y
+    internet site
+    system mail name: spendmail.ru
+
+openssl genrsa -des3 -out spendmail.key 2048
+    pass 123
+chmod 600 spendmail.key
+
+openssl req -new -key spendmail.key -out spendmail.csr
+    pass 123
+
+openssl x509 -req -days 36500 -in spendmail.csr -signkey spendmail.key -out spendmail.crt
+
+openssl rsa -in spendmail.key -out spendmail.key.nopass
+    pass 123
+
+mv spendmail.key.nopass spendmail.key
+
+openssl req -new -x509 -extensions v3_ca -keyout cakey.pem -out cacert.pem -days 36500
+    pass 123
+
+chmod 600 spendmail.key
+chmod 600 cakey.pem
+
+mv spendmail.key /etc/ssl/private/
+mv spendmail.crt /etc/ssl/certs/
+mv cakey.pem /etc/ssl/private/
+mv cacert.pem /etc/ssl/certs/
+
+
+
+
+
+
+nano /etc/postfix/main.cf
+    дописать
+mydomain = spendmail.ru
+myorigin = $mydomain
+
+home_mailbox = Maildir/
+#mailbox_command = ... - закомментировать
+mailbox_command =
+
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_auth_enable = yes
+
+smtpd_tls_auth_only = no
+smtpd_use_tls = yes
+smtp_use_tls = yes
+smtp_tls_note_starttls_offer = yes
+
+smtpd_tls_key_file = /etc/ssl/private/spendmail.key
+smtpd_tls_cert_file = /etc/ssl/certs/spendmail.crt
+smtpd_tls_CAfile = /etc/ssl/certs/cacert.pem
+
+smtpd_tls_loglevel = 1
+smtpd_tls_received_header = yes
+smtpd_tls_session_cache_timeout = 3600s
+
+#Можно в консоли
+# postconf -e "smtpd_tls_auth_only = no"
+
+nano /etc/postfix/main.cf
+
+service postfix restart
+service postfix status
+
+
+
+
+
+
+////////////////////////////////////
+////////////DOVECOT/////////////////
+////////////////////////////////////
+apt-get install dovecot-common dovecot-imapd
+cd /etc/dovcot/conf.d/
+
+nano 10-ssl.conf
+ssl = required
+ssl_cert = </etc/ssl/certs/spendmail.crt
+ssl_key = </etc/ssl/private/spendmail.key
+
+
+nano 10-auth.conf
+disable_plaintext_auth = yes
+
+
+nano 10-master.conf
+# Postfix smtp-auth
+unix_listener /var/spool/postfix/private/auth {
+    mode = 0666
+    user = postfix
+    group = postfix
+}
+
+
+nano 10-mail.conf
+mail_location = maildir:~/Maildir
+#mail_location = mbox:~/mail:INBOX=/var/mail/%u
+inbox = yes
+mail_privileged_group = mail
+
+
+service dovecot restart
+service dovecot status
+
+
+
+
+
+
+
+
+adduser tom
+    pass 123
+adduser sam
+    pass 123
+
+
+
+
+////////////////////////////////////
+/////////////ALIASES////////////////
+////////////////////////////////////
+/etc/aliases
+- используется для поиска алиасов пользователей почтовым сервером
+- в том числе для несуществующих пользователей
+- почтовый сервер использует скомпилированный файл /etc/aliases.db или /etc/aliases.dbm
+- пример:
+tom:    any
+
+#ребилд /etc/aliases.db
+newaliases
+
+#рестарт postfix
+service postfix restart
+
+
+
+//Использование регулярных выражений для алиаса
+nano /etc/postfix/main.cf
+alias_maps = hash:/etc/aliases regexp:/etc/aliases-regexp
+
+nano /etc/aliases-regexp
+/^user.*/    any
+
+newaliases
+service postfix restart
+
+
+
+
+/////////////////////////////////////////////////////////
+///////////////Настройка виртуальных адресов/////////////
+/////////////////////////////////////////////////////////
+# Настраиваем виртуальных пользователей
+
+# 1. Создадим группу для виртуальных почтовых ящиков:
+sudo groupadd -g 5000 vmail
+
+# Добавим владельца:
+sudo useradd -m -u 5000 -g 5000 -s /bin/bash vmail
+
+#2. Отредактируем /etc/postfix/main.cf.
+#Параметр mydestancion должен быть пустым:
+mydestination =
+
+# Добавим в конец файла:
+virtual_mailbox_domains = /etc/postfix/vhosts
+virtual_mailbox_base = /home/vmail
+virtual_mailbox_maps = hash:/etc/postfix/vmaps
+virtual_mailbox_limit = 0
+virtual_minimum_uid = 1000
+virtual_uid_maps = static:5000
+virtual_gid_maps = static:5000
+
+# 3. Создадим файл, содержащий список доменов:
+sudo vi /etc/postfix/vhosts
+
+# С содержимым:
+domain1.com
+domain2.com
+
+# 4. Создадим файл со списком виртуальных почтовых ящиков:
+sudo vi /etc/postfix/vmaps
+
+# Следующего содержания:
+info@example.com  example.com/info/
+alias@example.com  example.com/info/
+sales@example.com  example.com/sales/
+info@example2.com  example2.com/info/
+sales@example2.com  example2.com/sales/
+
+
+info@spendmail.ru spendmail.ru/info/
+alias@spendmail.ru  spendmail.ru/info/
+tom@spendmail.ru  spendmail.ru/tom/
+any@spendmail.ru  spendmail.ru/any/
+sam@spendmail.ru  spendmail.ru/sam/
+
+# 5. Теперь необходимо преобразовать виртуальные почтовые ящики в хэш, командой:
+sudo postmap /etc/postfix/vmaps
+
+# Это необходимо делать после каждого изменения виртуальных почтовых ящиков.
+# Чтобы изменения вступили в силу, необходимо перезапустить postfix
+sudo  /etc/init.d/postfix restart
+
+# 6. Проверим работу виртуальных почтовых ящиков, отправив на один из них письмо:
+mail info@domain1.com
+mail info@spendmail.ru
+#если все верно, то в директории /home/vmail создастся поддиректория domain1.com/info -
+# содержашая виртуальный почтовый ящик вкотором должно находиться посланное нами письмо.
+
+
+
+
+
+
+
+
+
+
+
+
