@@ -10,3 +10,12 @@ nano /opt/PhpStorm/bin/phpstorm64.vmoptions
 
 4. Если phpStorm переустанавливается, то импортировать старые настройки нельзя
 
+
+
+//Сброс пробной лицензии
+cd ~/.PhpStorm2018.2/
+rm config/eval/PhpStorm182.evaluation.key
+rm config/options/options.xml
+cd ~/.java/.userPrefs/jetbrains
+rm -rf phpstorm
+Запуск
