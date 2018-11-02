@@ -1,0 +1,15 @@
+
+//Установка exiftool
+sudo apt-get update
+sudo apt-get install libimage-exiftool-perl
+
+
+
+//Конвертация
+exiftool -b -JpgFromRaw file.nef > file.jpg
+
+
+
+//Пакетная конвертация
+for i in `ls *.NEF`; do echo $i; exiftool -b -JpgFromRaw $i > /tmp/out/$i.jpg; done
+

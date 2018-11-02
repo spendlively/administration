@@ -1,0 +1,26 @@
+
+//Вывод звука на все аудио-устройства одновременно
+
+
+
+//Установка
+sudo apt update
+sudo apt install paprefs
+
+
+
+//Запуск
+PulseAudio Preferences
+//или в консоли
+paprefs
+
+
+
+//Включение передачи звука на все устройства
+1. На последней вкладке "Simultaneous Output"
+поставить галочку "Add virtual output device for simultaneous output on all sound cards"
+
+2. В стандартных настках звука,
+на вкладке вывод, выбрать устройство "Simultaneous Output"
+
+3. Мне потребовалось перезагрузиться
