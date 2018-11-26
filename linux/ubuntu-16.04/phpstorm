@@ -12,6 +12,8 @@ nano /opt/PhpStorm/bin/phpstorm64.vmoptions
 
 
 
+
+
 //Сброс пробной лицензии
 cd ~/.PhpStorm2018.2/
 rm config/eval/PhpStorm182.evaluation.key
@@ -19,3 +21,13 @@ rm config/options/options.xml
 cd ~/.java/.userPrefs/jetbrains
 rm -rf phpstorm
 Запуск
+
+
+
+
+
+//Выбор диалекта sql в phpstorm
+//sql dialect is not configured
+File->Settings->Languages and frameworks->SQL Dialects
+ - Global sql dialect
+ - Project sql dialect
