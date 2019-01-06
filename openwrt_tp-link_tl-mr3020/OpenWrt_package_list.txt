@@ -1,0 +1,31 @@
+
+//Пакеты
+//Обновить список пакетов
+opkg update
+
+//Для подключения USB модема (режим stick)
+opkg install comgt
+opkg install kmod-usb-serial
+opkg install kmod-usb-serial-option
+opkg install kmod-usb-serial-wwan
+opkg install kmod-usb-uhci
+opkg install usb-modeswitch
+opkg install luci-proto-3g
+opkg install kmod-usb-acm
+
+//Для режима usb-ethernet (не проверял)
+opkg install kmod-usb-net 
+kmod-usb-net-cdc-eem 
+kmod-usb-net-cdc-ether 
+kmod-usb-net-cdc-mbim 
+kmod-usb-net-cdc-ncm
+
+//Для работы iptables
+opkg update
+opkg install iptables-mod-ipopt
+opkg install kmod-ipt-ipopt
+
+//Для подключения телефона в режиме USB модема (Tethering)
+opkg install kmod-usb-net
+opkg install kmod-usb-net-rndis
+opkg install kmod-usb-net-cdc-ether

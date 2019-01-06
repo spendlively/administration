@@ -1,0 +1,15 @@
+
+//Настройка
+Network -> WiFi
+Add
+
+ESSID: OpenWrt (Имя сети)
+Mode: Access Point
+Network: Lan
+
+Wireless Security:
+Encryption: WPA2-PSK
+Cipher: auto
+Key — password
+Save & Apply
+

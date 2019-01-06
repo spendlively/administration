@@ -1,0 +1,27 @@
+
+//Установка недостающих пакетов
+//Связано с ошибкой: openwrt iptables unknown option "--ttl-set"
+opkg update
+opkg install iptables-mod-ipopt
+opkg install kmod-ipt-ipopt
+
+
+
+//Команды
+iptables -t mangle -A PREROUTING -j TTL --ttl-set 65
+iptables -t mangle -A POSTROUTING -j TTL --ttl-set 65
+iptables -t mangle -A FORWARD -j TTL --ttl-set 65
+iptables -t mangle -A INPUT -j TTL --ttl-set 65
+iptables -t mangle -A OUTPUT -j TTL --ttl-set 65
+
+
+
+//Добавляем в файл /etc/rc.local
+//чтобы правила применялись при запуске
+vim /etc/rc.local
+
+
+
+//Проверка
+ping openWrt - должен быть 65, 
+чтобы при прохождении через телефон/модет ttl уменьшался до 64-х
