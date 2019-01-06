@@ -1,0 +1,56 @@
+
+//Смена IMEI 3g модема
+http://kkblog.ru/smena-imei-3g-4g-usb-modem-huawei/
+
+
+
+
+
+//Как прошить роутер tp-link tl-mr3020 из COM-порта
+https://forum.tp-linkru.com/viewtopic.php?t=1563&start=10
+(Искать фразу: Восстановление роутера, после неудачной прошивки:)
+https://openwrt.org/ru/toh/tp-link/tl-mr3020
+https://istarik.ru/blog/openwrt/9.html
+
+
+
+
+
+//AT - команды для перевода модема в режим только модем и другие
+http://did5.ru/it/windows/otklyuchit-avtozapusk-cd-rom-i-kartridera-na-3g-modeme-huawei-e156g.html
+
+
+
+
+
+//Вывести дополнительную инфонмацию из веб-морды МТС
+https://4pda.ru/forum/index.php?showtopic=562351&st=160
+(Искать слово javascript)
+
+
+
+
+
+//Другие ссылки по OpenWrt
+http://wiki.openwrt.org/ru/start
+https://groups.google.com/forum/?hl=ru#!forum/openwrt2ru
+https://oldwiki.archive.openwrt.org/ru/toh/tp-link/tl-mr3020
+https://oldwiki.archive.openwrt.org/doc/howto/basic.config
+http://i18n.luci.subsignal.org/pootle/ru/
+
+
+
+
+//Команды операционной системы OpenWRT
+http://srr.cherkessk.ru/owrt/help-owrt.html
+http://cyber-place.ru/showthread.php?t=378
+
+
+
+
+
+//Проблема с кракозябрами по UART решена.
+Необходимо использовать USB-TTL на чипе CP2102, все заработало как нужно.
+На чипе CH430G не годится.
+
+
