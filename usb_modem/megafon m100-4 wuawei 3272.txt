@@ -34,3 +34,5 @@ http://4pda.ru/forum/index.php?showtopic=508842&st=5580#entry37575407
 //Прошивки huawei
 https://3ginfo.ru/download58.html
 
+//Восстановление модемов E3272/E3276, E3372s и E3372h с HiLink-прошивкой
+http://4pda.ru/forum/index.php?showtopic=508842&st=7520#entry40864381
