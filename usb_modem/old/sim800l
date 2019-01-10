@@ -1,0 +1,209 @@
+
+///////////////////////////////////////////////////////
+///////////////////////ПОДКЛЮЧЕНИЕ/////////////////////
+///////////////////////////////////////////////////////
+
+//Подключение USB to TTL к SIM800L
+TTL TXD -> RXD SIM800L
+TTL RXD -> TXD SIM800L
+TTL GND -> GND SIM800L
+TTL +5V -> 5VIN SIM800L
+
+//Определение USB-устройства
+lsusb
+    Bus 003 Device 010: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+
+//USB-порт
+ls -la /dev/tty [tab]
+    /dev/ttyUSB0
+
+//или
+dmesg | grep tty
+
+//Последовательный порт, проброшенный через USB
+sudo stty -F /dev/ttyUSB0
+    speed 9600 baud; line = 0;
+    -brkint -imaxbel
+
+//Попробуем скопировать текстовый файл в порт
+sudo cp /etc/hosts /dev/ttyUSB0
+    На плате моргнет синий светодиод
+
+//Примем что-нибудь обратно в комп
+cat /dev/ttyUSB0
+
+
+
+
+
+//////////////////////////////////////////////////
+/////////////////////MINICOM//////////////////////
+//////////////////////////////////////////////////
+minicom - программа связи через последовательный порт с интерфейсом основанным на меню
+
+//Установка
+sudo apt install minicom
+
+//Настрока
+sudo minicom -s
+    Serial port setup
+        A - ввести имя USB-порта -> ENTER
+        E - ввести скорость порта (9600) -> C -> ENTER
+        ENTER
+    Save setup as dfl (default) -> ENTER
+    Exit
+
+//Горячие клавиши
+Справка: CTRL-A Z
+Конфигурация: CTRL-A O
+Инициализация модема: CTRL-A M
+Выход: CTRL-A Q
+
+//Отправка СМС
+at
+    ok
+AT+CMGF=1
+    ok
+AT+CPIN="0000"
+    error
+AT+CSMP?
+    ok
+    +CSMP: 17,255,0,0
+AT+CMGS="+79232375741"
+Hello world! ctrl+z
+
+//Чтение СМС
+AT+CMGL=?
+AT+CMGL="ALL"
+
+
+
+
+
+//////////////////////////////////////////////////
+///////////////////////GAMMU//////////////////////
+//////////////////////////////////////////////////
+//https://xakep.ru/2015/04/07/195-sms/
+//Установка
+sudo apt install gammu
+
+//Настройка
+gammu-config (~/.gammurc)
+
+nano ~/.bash_profile
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+//Отправка сообщения
+echo "Hello from gamma" | gammu sendsms TEXT +79232375741
+echo "Привет, я SIM800L!" | gammu sendsms TEXT +79232375741 -unicode
+
+//Чтение сообщений
+sudo gammu getallsms
+
+
+
+
+
+////////////////////////////////////////////////////
+/////////ОТПРАВКА СМС С МОДЕМА HUAWEI E173//////////
+////////////////////////////////////////////////////
+//Подключение к /dev/ttyUSB0 9600
+minicom -s
+
+//Проверка
+at
+
+//Разблокировка
+AT^CARDLOCK="59503872"
+or
+AT^CARDLOCK="49121250"
+or
+AT^CARDLOCK="56309848"
+or
+AT^CARDLOCK="40545050"
+
+//Отправка СМС
+AT+CSCS="GSM"
+AT+CMGF=1
+AT+CMGS="+79232375741"
+Text <CTRL> + z
+
+//gammu
+gammu-config
+echo "Привет, я SIM800L (Beeline ZTE)!" | gammu sendsms TEXT +79232375741 -unicode
+
+
+
+
+
+
+////////////////////////////////////////////////////
+///////////КОДЫ МОДЕМОВ ДЛЯ РАЗБЛОКИРОВКИ///////////
+////////////////////////////////////////////////////
+//Megafon 4g black huawei E392
+IMEI 		861230010137173
+flash code 	46195670
+v1 code 	47557950
+v2 code 	41944057
+v201 code 	20996403
+
+//Megafon 3g white huawei E173
+IMEI 		352216043517438
+flash code 	59503872
+v1 code 	49121250
+v2 code 	56309848
+v201 code 	40545050
+
+//Megafon 4g white huawei M100-3
+IMEI 		862926028394982
+flash code 	54270150
+v1 code 	58524024
+v2 code 	81227944
+v201 code 	98083690
+
+//Beeline 3g black zte mf667
+IMEI 		355397053782000
+flash code 	48623932
+v1 code 	58911381
+v2 code 	37040792
+v201 code 	21678951
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////ПЕРЕКЛЮЧЕНИЕ РЕЖИМА МОДЕМА//////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//Переключение 3g модема в режим модема Huawei E173
+//Если при подключении модем видно в lsusb,
+//но в списке /dev/ttyUSB он отсутствует
+
+//1. Установка usb-modeswitch
+sudo apt install usb-modeswitch
+
+//2. Конфигурирование
+//Надо нагуглить DefaultVendor и DefaultProduct
+sudo nano /etc/usb_modeswitch.conf
+EnableLogging=1
+DefaultVendor=0x12d1
+DefaultProduct=0x1446
+TargetVendor=0x12d1
+TargetProductList="1001,1406,140b,140c,141b,14ac"
+CheckSuccess=20
+MessageContent="55534243123456780000000000000011060000000000000000000000000000"
+
+//3. Включение режима модема
+sudo usb_modeswitch -c /etc/usb_modeswitch.conf
+
+
+
+
+
+//////////////////////////////////////////////////
+///////////////////////Почитать///////////////////
+//////////////////////////////////////////////////
+- FTDI
+- UART / COM
+- USB TO TTL
